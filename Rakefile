@@ -3,6 +3,8 @@ require "rake/testtask"
 require "rake/rdoctask"
 require "lib/breadcrumbs/version"
 
+task :default => :test
+
 Rake::TestTask.new do |t|
   t.libs << "test"
   t.libs << "lib"
@@ -19,15 +21,19 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include("lib/**/*.rb")
 end
 
-JEWEL = Jeweler::Tasks.new do |gem|
-  gem.name = "breadcrumbs"
-  gem.email = "fnando.vieira@gmail.com"
-  gem.homepage = "http://github.com/fnando/breadcrumbs"
-  gem.authors = ["Nando Vieira"]
-  gem.version = Breadcrumbs::Version::STRING
-  gem.summary = "Breadcrumbs is a simple plugin that adds a `breadcrumbs` object to controllers and views."
-  gem.description = "Breadcrumbs is a simple plugin that adds a `breadcrumbs` object to controllers and views."
-  gem.files =  FileList["README.rdoc", "{lib,test}/**/*"]
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |gem|
+    gem.name = "bsm-breadcrumbs"
+    gem.email = "dimitrij@blacksquaremedia.com"
+    gem.homepage = "http://github.com/bsm/breadcrumbs"
+    gem.authors = ["Nando Vieira", "Dimitrij Denissenko"]
+    gem.version = Breadcrumbs::Version::STRING
+    gem.summary = "Breadcrumbs is a simple plugin that adds a `breadcrumbs` object to controllers and views."
+    gem.description = "Breadcrumbs is a simple plugin that adds a `breadcrumbs` object to controllers and views."
+    gem.add_runtime_dependency "actionpack", ">= 3.0.0"
+  end
+  Jeweler::GemcutterTasks.new
+rescue LoadError
+  puts "Jeweler not available. Install it with: gem install jeweler"
 end
-
-Jeweler::GemcutterTasks.new

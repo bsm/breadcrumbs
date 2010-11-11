@@ -1,12 +1,15 @@
 class Breadcrumbs
   module ActionController # :nodoc: all
-    def self.included(base)
-      base.send :helper_method, :breadcrumbs
+    extend ActiveSupport::Concern
+
+    included do
+      helper_method :breadcrumbs
     end
 
     def breadcrumbs
-      @breadcrumbs ||= Breadcrumbs.new
+      @breadcrumbs ||= Breadcrumbs.new(self)
     end
+
   end
 end
 

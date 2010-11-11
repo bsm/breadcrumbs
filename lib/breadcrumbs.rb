@@ -1,12 +1,13 @@
-require "i18n" unless defined?(I18n)
+require "action_controller"
 require "breadcrumbs/render"
-require "breadcrumbs/action_controller_ext" if defined?(ActionController)
+require "breadcrumbs/action_controller_ext"
 require "active_support/inflector"
 
 class Breadcrumbs
-  attr_accessor :items
+  attr_accessor :controller, :items
 
-  def initialize # :nodoc:
+  def initialize(controller) # :nodoc:
+    self.controller = controller
     self.items = []
   end
 
@@ -22,6 +23,7 @@ class Breadcrumbs
   def add(text, url = nil, options = {})
     options.reverse_merge!(:i18n => true)
     text = translate(text) if options.delete(:i18n)
+    url  = controller.__send__(:url_for, url) if url
     items << [text.to_s, url, options]
   end
 

@@ -1,15 +1,18 @@
 require "test_helper"
 
 class BreadcrumbsTest < Test::Unit::TestCase
+
   def setup
-    @breadcrumbs = Breadcrumbs.new
+    @controller = TestsController.new
+    @controller.request = ActionController::TestRequest.new
+    @breadcrumbs = Breadcrumbs.new(@controller)
     @inline = Breadcrumbs::Render::Inline.new(@breadcrumbs)
   end
 
   def test_return_safe_html
-    html_mock = mock
-    html_mock.expects(:html_safe).once
-    Breadcrumbs::Render::List.any_instance.stubs(:render).returns(html_mock)
+    string = "HTML"
+    string.expects(:html_safe).once
+    Breadcrumbs::Render::List.any_instance.stubs(:render).returns(string)
     @breadcrumbs.render(:format => :list)
   end
 
@@ -47,23 +50,24 @@ class BreadcrumbsTest < Test::Unit::TestCase
 
   def test_render_as_list
     @breadcrumbs.add "Home", "/", :class => "home"
-    html = Nokogiri::HTML(@breadcrumbs.render)
-
-    assert_not_nil html.at("ul.breadcrumbs")
+    list = parse_tag(@breadcrumbs.render)
+    assert_equal "ul", list.name
+    assert_equal "breadcrumbs", list['class']
   end
 
   def test_render_as_ordered_list
     @breadcrumbs.add "Home", "/"
-    html = Nokogiri::HTML(@breadcrumbs.render(:format => :ordered_list))
-
-    assert_not_nil html.at("ol.breadcrumbs")
+    list = parse_tag(@breadcrumbs.render(:format => :ordered_list))
+    assert_equal "ol", list.name
+    assert_equal "breadcrumbs", list['class']
   end
 
   def test_render_as_list_with_custom_attributes
     @breadcrumbs.add "Home", "/", :class => "home"
-    html = Nokogiri::HTML(@breadcrumbs.render(:id => "breadcrumbs", :class => "top"))
-
-    assert_not_nil html.at("ul.top#breadcrumbs")
+    ul = parse_tag(@breadcrumbs.render(:id => "breadcrumbs", :class => "top"))
+    assert_equal "ul", ul.name
+    assert_equal "top", ul['class']
+    assert_equal "breadcrumbs", ul['id']
   end
 
   def test_render_as_list_add_items
@@ -71,36 +75,25 @@ class BreadcrumbsTest < Test::Unit::TestCase
     @breadcrumbs.add "About", "/about", :class => "about"
     @breadcrumbs.add "People"
 
-    html = Nokogiri::HTML(@breadcrumbs.render)
-    items = html.search("li")
+    ul = parse_tag(@breadcrumbs.render)
+    items = ul.children
 
     assert_equal 3, items.count
 
     assert_equal "first item-0", items[0]["class"]
-    assert_equal "Home", items[0].inner_text
-
-    link = items[0].at("a")
-    assert_equal "home", link["class"]
-    assert_equal "/", link["href"]
+    assert_equal %(<a href="/" class="home">Home</a>), items[0].children.join
 
     assert_equal "item-1", items[1]["class"]
-    assert_equal "About", items[1].inner_text
-
-    link = items[1].at("a")
-    assert_equal "about", link["class"]
-    assert_equal "/about", link["href"]
+    assert_equal %(<a href="/about" class="about">About</a>), items[1].children.join
 
     assert_equal "last item-2", items[2]["class"]
-    assert_equal "People", items[2].inner_text
-    assert_nil items[2].at("a")
-    assert_not_nil items[2].at("span")
+    assert_equal %(<span>People</span>), items[2].children.join
   end
 
   def test_render_inline
     @breadcrumbs.add "Home", "/", :class => "home"
-    html = Nokogiri::HTML(@breadcrumbs.render(:format => :inline))
-
-    assert_nil html.at("ul.breadcrumbs")
+    item = parse_tag(@breadcrumbs.render(:format => :inline))
+    assert_not_equal 'ul', item.name
   end
 
   def test_render_inline_add_items
@@ -108,85 +101,74 @@ class BreadcrumbsTest < Test::Unit::TestCase
     @breadcrumbs.add "About", "/about", :class => "about"
     @breadcrumbs.add "People"
 
-    html = @breadcrumbs.render(:format => :inline)
-    html = Nokogiri::HTML("<div>#{html}</div>")
-    separator = Nokogiri::HTML("<span>&#187;</span>").at("span").inner_text
-
-    items = html.search("div *")
-
+    items = parse_tags(@breadcrumbs.render(:format => :inline))
     assert_equal 5, items.count
 
     assert_equal "a", items[0].name
     assert_equal "home first item-0", items[0]["class"]
-    assert_equal "Home", items[0].inner_text
+    assert_equal "Home", items[0].children.join
     assert_equal "/", items[0]["href"]
 
     assert_equal "span", items[1].name
     assert_equal "separator", items[1]["class"]
-    assert_equal separator, items[1].inner_text
+    assert_equal "&#187;", items[1].children.join
 
     assert_equal "a", items[2].name
     assert_equal "about item-1", items[2]["class"]
-    assert_equal "About", items[2].inner_text
+    assert_equal "About", items[2].children.join
     assert_equal "/about", items[2]["href"]
 
     assert_equal "span", items[3].name
     assert_equal "separator", items[3]["class"]
-    assert_equal separator, items[3].inner_text
+    assert_equal "&#187;", items[3].children.join
 
     assert_equal "span", items[4].name
     assert_equal "last item-2", items[4]["class"]
-    assert_equal "People", items[4].inner_text
+    assert_equal "People", items[4].children.join
   end
 
   def test_render_inline_with_custom_separator
     @breadcrumbs.add "Home", "/", :class => "home"
     @breadcrumbs.add "People"
 
-    html = Nokogiri::HTML(@breadcrumbs.render(:format => :inline, :separator => "|"))
-
-    assert_equal "|", html.at("span.separator").inner_text
+    tags = parse_tags(@breadcrumbs.render(:format => :inline, :separator => "|"))
+    assert_equal [
+      %(<a href="/" class="home first item-0">Home</a>),
+      %(<span class="separator">|</span>),
+      %(<span class="last item-1">People</span>)
+    ], tags.map(&:to_s)
   end
 
   def test_render_original_text_when_disabling_translation
     @breadcrumbs.add :home, nil, :i18n => false
     @breadcrumbs.add :people
 
-    html = Nokogiri::HTML(@breadcrumbs.render)
-
-    items = html.search("li")
-
-    assert_equal "home", items[0].inner_text
-    assert_equal "Nosso time", items[1].inner_text
+    items = parse_tag(@breadcrumbs.render).children
+    assert_equal "<span>home</span>", items[0].children.join
+    assert_equal "<span>Nosso time</span>", items[1].children.join
   end
 
   def test_render_internationalized_text_using_default_scope
     @breadcrumbs.add :home
     @breadcrumbs.add :people
 
-    html = Nokogiri::HTML(@breadcrumbs.render)
-
-    items = html.search("li")
-
-    assert_equal "Página inicial", items[0].inner_text
-    assert_equal "Nosso time", items[1].inner_text
+    items = parse_tag(@breadcrumbs.render).children
+    assert_equal "<span>Página inicial</span>", items[0].children.join
+    assert_equal "<span>Nosso time</span>", items[1].children.join
   end
 
   def test_render_scope_as_text_for_missing_scope
     @breadcrumbs.add :contact
     @breadcrumbs.add "Help"
 
-    html = Nokogiri::HTML(@breadcrumbs.render)
-
-    items = html.search("li")
-
-    assert_equal "contact", items[0].inner_text
-    assert_equal "Help", items[1].inner_text
+    items = parse_tag(@breadcrumbs.render).children
+    assert_equal "<span>contact</span>", items[0].children.join
+    assert_equal "<span>Help</span>", items[1].children.join
   end
 
   def test_pimp_action_controller
-    methods = ActionController::Base.instance_methods
-    assert (methods.include?(:breadcrumbs) || methods.include?("breadcrumbs"))
+    assert @controller.respond_to?(:breadcrumbs)
+    assert_equal @controller.breadcrumbs, @controller.breadcrumbs
   end
 
   def test_escape_text_when_rendering_inline
@@ -202,4 +184,40 @@ class BreadcrumbsTest < Test::Unit::TestCase
 
     assert_match /&lt;script&gt;alert\(1\)&lt;\/script&gt;/, html
   end
+
+  def test_allow_custom_text_escaping
+    @breadcrumbs.add "<em>Home</em>".html_safe
+    html = @breadcrumbs.render(:format => :inline)
+
+    assert_equal %[<span class="first last item-0"><em>Home</em></span>], html
+  end
+
+  def test_with_polymorphic_urls
+    @breadcrumbs.add "Resources", [:tests]
+    prefix  = "#{@controller.request.scheme}://#{@controller.request.host}"
+    tag     = parse_tag(@breadcrumbs.render(:format => :inline))
+
+    assert_equal "a", tag.name
+    assert_equal "first last item-0", tag['class']
+    assert_equal "#{prefix}/tests", tag['href']
+    assert_equal "Resources", tag.children.join
+  end
+
+  private
+
+    def reject_blanks!(tag)
+      tag.children.reject! do |child|
+        child.tag? ? (reject_blanks!(child) && false) : child.to_s.blank?
+      end
+    end
+
+    def parse_tags(html)
+      root = HTML::Document.new(html, true, true).root
+      reject_blanks!(root)
+      root.children
+    end
+
+    def parse_tag(html)
+      parse_tags(html).first
+    end
 end
