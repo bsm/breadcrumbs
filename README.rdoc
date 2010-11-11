@@ -34,6 +34,10 @@ You can set additional HTML attributes if you need to:
 
   breadcrumbs.add 'Home', root_path, :id => 'home', :title => 'Go to the home page'
 
+You can also use polymorphic routes. Example:
+
+  breadcrumbs.add 'Manage User', [:admin, @user] # => e.g. /admin/users/123
+
 On your view (possibly application.html.erb):
 
   <%= breadcrumbs.render %>
@@ -88,6 +92,7 @@ If you don't want to translate a label, just pass the option <tt>:i18n</tt> as <
 == Maintainer
 
 * Nando Vieira - http://simplesideias.com.br
+* Dimitrij Denissenko
 
 License
 
