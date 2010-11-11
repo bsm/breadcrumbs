@@ -5,10 +5,9 @@ class Breadcrumbs
         options = {:class => "breadcrumbs", :separator => "&#187;"}.merge(default_options)
 
         html = []
-        items = breadcrumbs.items
-        size = items.size
+        size = breadcrumbs.size
 
-        items.each_with_index do |item, i|
+        breadcrumbs.each_with_index do |item, i|
           html << render_item(item, i, size)
         end
 

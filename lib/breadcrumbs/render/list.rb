@@ -8,10 +8,9 @@ class Breadcrumbs
 
         tag(list_style, options) do
           html = ""
-          items = breadcrumbs.items
-          size = items.size
+          size = breadcrumbs.size
 
-          items.each_with_index do |item, i|
+          breadcrumbs.each_with_index do |item, i|
             html << render_item(item, i, size)
           end
 

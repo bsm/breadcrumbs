@@ -22,10 +22,10 @@ class BreadcrumbsTest < Test::Unit::TestCase
 
   def test_add_item
     @breadcrumbs.add "Home"
-    assert_equal 1, @breadcrumbs.items.count
+    assert_equal 1, @breadcrumbs.count
 
     @breadcrumbs << "Home"
-    assert_equal 2, @breadcrumbs.items.count
+    assert_equal 2, @breadcrumbs.count
   end
 
   def test_tag

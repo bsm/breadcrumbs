@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{bsm-breadcrumbs}
-  s.version = "0.2.0"
+  s.version = "0.2.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nando Vieira", "Dimitrij Denissenko"]
@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
      "Gemfile.lock",
      "README.rdoc",
      "Rakefile",
+     "bsm-breadcrumbs.gemspec",
      "lib/breadcrumbs.rb",
      "lib/breadcrumbs/action_controller_ext.rb",
      "lib/breadcrumbs/render.rb",

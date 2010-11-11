@@ -1,14 +1,15 @@
 require "action_controller"
-require "breadcrumbs/render"
-require "breadcrumbs/action_controller_ext"
 require "active_support/inflector"
 
-class Breadcrumbs
+class Breadcrumbs < Array
+  autoload :Render, "breadcrumbs/render"
+  autoload :Version, "breadcrumbs/version"
+
   attr_accessor :controller, :items
 
   def initialize(controller) # :nodoc:
     self.controller = controller
-    self.items = []
+    super([])
   end
 
   # Add a new breadcrumbs.
@@ -24,7 +25,7 @@ class Breadcrumbs
     options.reverse_merge!(:i18n => true)
     text = translate(text) if options.delete(:i18n)
     url  = controller.__send__(:url_for, url) if url
-    items << [text.to_s, url, options]
+    push [text.to_s, url, options]
   end
 
   alias :<< :add
@@ -69,3 +70,5 @@ class Breadcrumbs
     text
   end
 end
+
+require "breadcrumbs/action_controller_ext"
