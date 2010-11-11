@@ -7,7 +7,6 @@ require 'test/unit'
 require "breadcrumbs"
 require 'action_controller'
 require 'action_controller/test_case'
-require 'mocha'
 
 I18n.load_path << File.dirname(__FILE__) + "/resources/pt.yml"
 I18n.locale = :pt

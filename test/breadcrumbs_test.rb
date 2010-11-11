@@ -10,10 +10,14 @@ class BreadcrumbsTest < Test::Unit::TestCase
   end
 
   def test_return_safe_html
-    string = "HTML"
-    string.expects(:html_safe).once
-    Breadcrumbs::Render::List.any_instance.stubs(:render).returns(string)
-    @breadcrumbs.render(:format => :list)
+    @breadcrumbs.add "Terms & Conditions"
+    assert_equal %(<span class="first last item-0">Terms &amp; Conditions</span>), @breadcrumbs.render(:format => :inline)
+  end
+
+  def test_allow_custom_text_escaping
+    @breadcrumbs.add "<em>Home</em>".html_safe
+    html = @breadcrumbs.render(:format => :inline)
+    assert_equal %(<span class="first last item-0"><em>Home</em></span>), html
   end
 
   def test_add_item
@@ -183,13 +187,6 @@ class BreadcrumbsTest < Test::Unit::TestCase
     html = @breadcrumbs.render
 
     assert_match /&lt;script&gt;alert\(1\)&lt;\/script&gt;/, html
-  end
-
-  def test_allow_custom_text_escaping
-    @breadcrumbs.add "<em>Home</em>".html_safe
-    html = @breadcrumbs.render(:format => :inline)
-
-    assert_equal %[<span class="first last item-0"><em>Home</em></span>], html
   end
 
   def test_with_polymorphic_urls
