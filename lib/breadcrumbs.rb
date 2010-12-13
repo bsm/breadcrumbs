@@ -5,10 +5,10 @@ class Breadcrumbs < Array
   autoload :Render, "breadcrumbs/render"
   autoload :Version, "breadcrumbs/version"
 
-  attr_accessor :controller, :items
+  attr_reader :controller
 
   def initialize(controller) # :nodoc:
-    self.controller = controller
+    @controller = controller
     super([])
   end
 
@@ -27,8 +27,40 @@ class Breadcrumbs < Array
     url  = controller.__send__(:url_for, url) if url
     push [text.to_s, url, options]
   end
-
   alias :<< :add
+
+  # Short-cut for adding breadcrumbs. Examples:
+  #
+  #   breadcrumbs.crumb :posts
+  #   # => ["Posts", "/posts"]
+  #
+  #   breadcrumbs.crumb @post, :comments
+  #   # => ["Comments", "/posts/123/comments"]
+  #
+  #   @user # => #<User name: "Sam">
+  #   breadcrumbs.crumb :admin, @account, @user
+  #   # => ["Sam", "/admin/accounts/123/users/456"]
+  #
+  #   breadcrumbs.crumb @post, :comments, :title => "Our Comments"
+  #   # => ["Our Comments", "/posts/123/comments"]
+  #
+  def crumb(*args)
+    options = args.extract_options!
+
+    title = if options[:title]
+      options.delete(:title)
+    else
+      case args.last
+      when String, Symbol
+        infer_model_name_from_symbol(args.last).human(:count => :multiple)
+      else
+        infer_title_from_record(args.last)
+      end
+    end
+    url = args.presence || false
+
+    add title.presence, options.delete(:url) || url, options
+  end
 
   # Render breadcrumbs using the specified format.
   # Use HTML lists by default, but can be plain links.
@@ -69,6 +101,19 @@ class Breadcrumbs < Array
     text ||= I18n.t(scope, :default => scope.to_s)
     text
   end
+
+  private
+
+    def infer_model_name_from_symbol(symbol)
+      symbol.to_s.classify.constantize.model_name
+    end
+
+    def infer_title_from_record(record)
+      %w(to_label title_was title name_was name label_was label value_was value to_s).each do |m|
+        return record.send(m) if record.respond_to?(m)
+      end
+    end
+
 end
 
 require "breadcrumbs/action_controller_ext"

@@ -7,21 +7,37 @@ require 'test/unit'
 require "breadcrumbs"
 require 'action_controller'
 require 'action_controller/test_case'
+require 'active_model/naming'
 
-I18n.load_path << File.dirname(__FILE__) + "/resources/pt.yml"
-I18n.locale = :pt
+I18n.load_path << File.dirname(__FILE__) + "/resources/en.yml"
+I18n.locale = :en
 
 class TestsController < ActionController::Base
 end
 
-if ActionPack::VERSION::MAJOR == 3
-  routes = ActionDispatch::Routing::RouteSet.new
-  routes.draw do
-    resources :tests
+class UsersController < ActionController::Base
+end
+
+module Admin
+  class UsersController < ActionController::Base
   end
-  TestsController.send(:include, routes.url_helpers)
-else
-  ActionController::Routing::Routes.draw do |map|
-    map.resources :tests
+end
+
+routes = ActionDispatch::Routing::RouteSet.new
+routes.draw do
+  resources :tests
+  resources :users
+  namespace :admin do
+    resources :users
   end
+end
+TestsController.send(:include, routes.url_helpers)
+
+class User
+  extend ActiveModel::Naming
+  extend ActiveModel::Translation
+
+  def to_param; "123" end
+  def name_was; "Sam" end
+  def name; "" end
 end

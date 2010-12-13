@@ -149,7 +149,7 @@ class BreadcrumbsTest < Test::Unit::TestCase
 
     items = parse_tag(@breadcrumbs.render).children
     assert_equal "<span>home</span>", items[0].children.join
-    assert_equal "<span>Nosso time</span>", items[1].children.join
+    assert_equal "<span>Our team</span>", items[1].children.join
   end
 
   def test_render_internationalized_text_using_default_scope
@@ -157,8 +157,8 @@ class BreadcrumbsTest < Test::Unit::TestCase
     @breadcrumbs.add :people
 
     items = parse_tag(@breadcrumbs.render).children
-    assert_equal "<span>Página inicial</span>", items[0].children.join
-    assert_equal "<span>Nosso time</span>", items[1].children.join
+    assert_equal "<span>Home page</span>", items[0].children.join
+    assert_equal "<span>Our team</span>", items[1].children.join
   end
 
   def test_render_scope_as_text_for_missing_scope
@@ -198,6 +198,18 @@ class BreadcrumbsTest < Test::Unit::TestCase
     assert_equal "first last item-0", tag['class']
     assert_equal "#{prefix}/tests", tag['href']
     assert_equal "Resources", tag.children.join
+  end
+
+  def test_crumb_shortcuts
+    @breadcrumbs.crumb :users
+    @breadcrumbs.crumb :users, :title => "Custom"
+    @breadcrumbs.crumb :admin, :users
+    @breadcrumbs.crumb :admin, User.new
+
+    assert_equal ["Users", "http://test.host/users", {}], @breadcrumbs[0]
+    assert_equal ["Custom", "http://test.host/users", {}], @breadcrumbs[1]
+    assert_equal ["Users", "http://test.host/admin/users", {}], @breadcrumbs[2]
+    assert_equal ["Sam", "http://test.host/admin/users/123", {}], @breadcrumbs[3]
   end
 
   private

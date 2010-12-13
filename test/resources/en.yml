@@ -1,0 +1,12 @@
+en:
+  activemodel:
+    models:
+      user:
+        one: User
+        other: Users
+
+  people: "Our team"
+
+  breadcrumbs:
+    home: "Home page"
+    about: "About us"
