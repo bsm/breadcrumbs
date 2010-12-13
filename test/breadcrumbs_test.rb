@@ -28,6 +28,11 @@ class BreadcrumbsTest < Test::Unit::TestCase
     assert_equal 2, @breadcrumbs.count
   end
 
+  def test_add_empty_item # Just in case, we generate the label
+    @breadcrumbs.add ""
+    assert_equal 1, @breadcrumbs.count
+  end
+
   def test_tag
     assert_equal "<span>Hi!</span>", @inline.tag(:span, "Hi!")
   end

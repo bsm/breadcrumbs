@@ -96,10 +96,9 @@ class Breadcrumbs < Array
     html.respond_to?(:html_safe) ? html.html_safe : html
   end
 
-  def translate(scope) # :nodoc:
-    text = I18n.t(scope, :scope => :breadcrumbs, :raise => true) rescue nil
-    text ||= I18n.t(scope, :default => scope.to_s)
-    text
+  def translate(key) # :nodoc:
+    return "" if key.blank?
+    I18n.t "breadcrumbs.#{key}", :default => [key.to_sym, key.to_s]
   end
 
   private
