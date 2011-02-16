@@ -31,7 +31,6 @@ begin
     gem.version = Breadcrumbs::Version::STRING
     gem.summary = "Breadcrumbs is a simple plugin that adds a `breadcrumbs` object to controllers and views."
     gem.description = "Breadcrumbs is a simple plugin that adds a `breadcrumbs` object to controllers and views."
-    gem.add_runtime_dependency "actionpack", ">= 3.0.0"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
