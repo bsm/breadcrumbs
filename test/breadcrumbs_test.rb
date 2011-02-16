@@ -166,6 +166,12 @@ class BreadcrumbsTest < Test::Unit::TestCase
     assert_equal "<span>Our team</span>", items[1].children.join
   end
 
+  def test_render_with_string_is_not_translated
+    @breadcrumbs.add 'home'
+    items = parse_tag(@breadcrumbs.render).children
+    assert_equal "<span>home</span>", items[0].children.join
+  end
+  
   def test_render_scope_as_text_for_missing_scope
     @breadcrumbs.add :contact
     @breadcrumbs.add "Help"

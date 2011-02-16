@@ -97,8 +97,8 @@ class Breadcrumbs < Array
   end
 
   def translate(key) # :nodoc:
-    return "" if key.blank?
-    I18n.t "breadcrumbs.#{key}", :default => [key.to_sym, key.to_s]
+    return key unless key.is_a?(Symbol)
+    I18n.t "breadcrumbs.#{key}", :default => [key, key.to_s]
   end
 
   private
