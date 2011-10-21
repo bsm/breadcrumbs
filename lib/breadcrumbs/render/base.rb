@@ -37,7 +37,7 @@ class Breadcrumbs
       end
 
       def escape(text)
-        text.respond_to?(:html_safe?) && text.html_safe? ? text : CGI.escapeHTML(text)
+        text.respond_to?(:html_safe?) && text.html_safe? ? text : Rack::Utils.escape_html(text)
       end
     end
   end

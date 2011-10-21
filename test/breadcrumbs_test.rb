@@ -90,10 +90,10 @@ class BreadcrumbsTest < Test::Unit::TestCase
     assert_equal 3, items.count
 
     assert_equal "first item-0", items[0]["class"]
-    assert_equal %(<a href="/" class="home">Home</a>), items[0].children.join
+    assert_equal %(<a class="home" href="/">Home</a>), items[0].children.join
 
     assert_equal "item-1", items[1]["class"]
-    assert_equal %(<a href="/about" class="about">About</a>), items[1].children.join
+    assert_equal %(<a class="about" href="/about">About</a>), items[1].children.join
 
     assert_equal "last item-2", items[2]["class"]
     assert_equal %(<span>People</span>), items[2].children.join
@@ -142,7 +142,7 @@ class BreadcrumbsTest < Test::Unit::TestCase
 
     tags = parse_tags(@breadcrumbs.render(:format => :inline, :separator => "|"))
     assert_equal [
-      %(<a href="/" class="home first item-0">Home</a>),
+      %(<a class="home first item-0" href="/">Home</a>),
       %(<span class="separator">|</span>),
       %(<span class="last item-1">People</span>)
     ], tags.map(&:to_s)
@@ -171,7 +171,7 @@ class BreadcrumbsTest < Test::Unit::TestCase
     items = parse_tag(@breadcrumbs.render).children
     assert_equal "<span>home</span>", items[0].children.join
   end
-  
+
   def test_render_scope_as_text_for_missing_scope
     @breadcrumbs.add :contact
     @breadcrumbs.add "Help"
@@ -190,14 +190,14 @@ class BreadcrumbsTest < Test::Unit::TestCase
     @breadcrumbs.add "<script>alert(1)</script>"
     html = @breadcrumbs.render(:format => :inline)
 
-    assert_equal %[<span class="first last item-0">&lt;script&gt;alert(1)&lt;/script&gt;</span>], html
+    assert_match /&lt;script&gt;alert\(1\)&lt;&#.*?;script&gt;/, html
   end
 
   def test_escape_text_when_rendering_list
     @breadcrumbs.add "<script>alert(1)</script>"
     html = @breadcrumbs.render
 
-    assert_match /&lt;script&gt;alert\(1\)&lt;\/script&gt;/, html
+    assert_match /&lt;script&gt;alert\(1\)&lt;&#.*?;script&gt;/, html
   end
 
   def test_with_polymorphic_urls

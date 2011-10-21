@@ -1,7 +1,6 @@
-require "jeweler"
 require "rake/testtask"
 require "rake/rdoctask"
-require "lib/breadcrumbs/version"
+require File.expand_path("../lib/breadcrumbs/version", __FILE__)
 
 task :default => :test
 
@@ -19,20 +18,4 @@ Rake::RDocTask.new do |rdoc|
   rdoc.options += %w[ --line-numbers --inline-source --charset utf-8 ]
   rdoc.rdoc_files.include("README.rdoc")
   rdoc.rdoc_files.include("lib/**/*.rb")
-end
-
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.name = "bsm-breadcrumbs"
-    gem.email = "dimitrij@blacksquaremedia.com"
-    gem.homepage = "http://github.com/bsm/breadcrumbs"
-    gem.authors = ["Nando Vieira", "Dimitrij Denissenko"]
-    gem.version = Breadcrumbs::Version::STRING
-    gem.summary = "Breadcrumbs is a simple plugin that adds a `breadcrumbs` object to controllers and views."
-    gem.description = "Breadcrumbs is a simple plugin that adds a `breadcrumbs` object to controllers and views."
-  end
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler not available. Install it with: gem install jeweler"
 end
