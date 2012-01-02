@@ -66,7 +66,7 @@ class BreadcrumbsTest < Test::Unit::TestCase
 
   def test_render_as_ordered_list
     @breadcrumbs.add "Home", "/"
-    list = parse_tag(@breadcrumbs.render(:format => :ordered_list))
+    list = parse_tag(@breadcrumbs.render(:tag => :ol))
     assert_equal "ol", list.name
     assert_equal "breadcrumbs", list['class']
   end
@@ -97,6 +97,21 @@ class BreadcrumbsTest < Test::Unit::TestCase
 
     assert_equal "last item-2", items[2]["class"]
     assert_equal %(<span>People</span>), items[2].children.join
+  end
+
+  def test_render_as_bootstrap_list
+    @breadcrumbs.add "Home", "/"
+    @breadcrumbs.add "About", "/about"
+    @breadcrumbs.add "People"
+
+    ul = parse_tag(@breadcrumbs.render(:format => :bootstrap))
+    items = ul.children
+
+    assert_equal({"class" => "breadcrumb"}, ul.attributes)
+    assert_equal 3, items.count
+    assert_equal %(<li><a href="/">Home<span class="divider">/</span></a></li>), items[0].to_s
+    assert_equal %(<li><a href="/about">About<span class="divider">/</span></a></li>), items[1].to_s
+    assert_equal %(<li class="active">People</li>), items[2].to_s
   end
 
   def test_render_inline

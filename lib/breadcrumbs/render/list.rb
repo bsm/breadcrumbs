@@ -1,11 +1,22 @@
 class Breadcrumbs
   module Render
     class List < Base # :nodoc: all
-      def render
-        options = {
-          :class => "breadcrumbs"
-        }.merge(default_options)
 
+      attr_reader :list_style
+
+      # @overload
+      def initialize(*)
+        super
+        @list_style = options.delete(:tag) || :ul
+      end
+
+      # @overload
+      def default_options
+        super.merge(:tag => :ul)
+      end
+
+      # @overload
+      def render
         tag(list_style, options) do
           html = ""
           size = breadcrumbs.size
@@ -16,10 +27,6 @@ class Breadcrumbs
 
           html
         end
-      end
-
-      def list_style
-        :ul
       end
 
       def render_item(item, i, size)

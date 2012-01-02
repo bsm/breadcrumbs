@@ -69,7 +69,9 @@ class Breadcrumbs < Array
   #   breadcrumbs.render(:format => :inline)
   #   breadcrumbs.render(:format => :inline, :separator => "|")
   #   breadcrumbs.render(:format => :list)
-  #   breadcrumbs.render(:format => :ordered_list)
+  #   breadcrumbs.render(:format => :list, :tag => :ol)
+  #   breadcrumbs.render(:format => :bootstrap)
+  #   breadcrumbs.render(:format => :bootstrap, :separator => "&raquo;")
   #   breadcrumbs.render(:id => "breadcrumbs")
   #   breadcrumbs.render(:class => "breadcrumbs")
   #
@@ -87,11 +89,9 @@ class Breadcrumbs < Array
   #   breadcrumbs.render(:format => :dl)
   #
   def render(options = {})
-    options[:format] ||= :list
-
-    klass_name = options[:format].to_s.classify
-    klass = Breadcrumbs::Render.const_get(klass_name)
-    html = klass.new(self, options).render
+    format = options.delete(:format) || :list
+    klass  = Breadcrumbs::Render.const_get(format.to_s.classify)
+    html   = klass.new(self, options).render
 
     html.respond_to?(:html_safe) ? html.html_safe : html
   end

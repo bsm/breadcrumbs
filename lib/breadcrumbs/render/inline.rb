@@ -1,9 +1,14 @@
 class Breadcrumbs
   module Render
     class Inline < Base # :nodoc: all
-      def render
-        options = {:class => "breadcrumbs", :separator => "&#187;"}.merge(default_options)
 
+      # @overload
+      def default_options
+        super.merge(:separator => "&#187;")
+      end
+
+      # @overload
+      def render
         html = []
         size = breadcrumbs.size
 

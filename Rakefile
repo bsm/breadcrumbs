@@ -1,5 +1,5 @@
 require "rake/testtask"
-require "rake/rdoctask"
+require "rdoc/task"
 require File.expand_path("../lib/breadcrumbs/version", __FILE__)
 
 task :default => :test

@@ -1,12 +1,24 @@
 class Breadcrumbs
   module Render
     class Base # :nodoc: all
-      attr_accessor :breadcrumbs
-      attr_accessor :default_options
 
-      def initialize(breadcrumbs, default_options = {})
+      attr_reader :breadcrumbs, :options
+
+      def initialize(breadcrumbs, options = {})
         @breadcrumbs = breadcrumbs
-        @default_options = default_options
+        @options     = default_options.merge(options)
+      end
+
+      # @abstract
+      # @return [Hash] default options
+      def default_options
+        { :class => "breadcrumbs" }
+      end
+
+      # @abstract
+      # @return [String] the rendered HTML
+      def render
+        ""
       end
 
       # Build a HTML tag.
