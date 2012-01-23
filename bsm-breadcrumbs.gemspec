@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.files        = Dir['README.rdoc', 'lib/**/*']
 
-  s.add_dependency "actionpack", ">= 3.0.0", "< 3.2.0"
-  s.add_dependency "activemodel", ">= 3.0.0", "< 3.2.0"
+  s.add_dependency "actionpack", ">= 3.0.0"
+  s.add_dependency "activemodel", ">= 3.0.0"
   s.add_development_dependency "rake"
 end

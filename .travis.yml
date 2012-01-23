@@ -3,4 +3,5 @@ rvm:
   - 1.9.3
 gemfile:
   - Gemfile
+  - Gemfile.rails-3.1.x
   - Gemfile.rails-3.0.x
