@@ -231,11 +231,13 @@ class BreadcrumbsTest < Test::Unit::TestCase
     @breadcrumbs.crumb :users, :title => "Custom"
     @breadcrumbs.crumb :admin, :users
     @breadcrumbs.crumb :admin, User.new
+    @breadcrumbs.crumb :images
 
     assert_equal ["Users", "http://test.host/users", {}], @breadcrumbs[0]
     assert_equal ["Custom", "http://test.host/users", {}], @breadcrumbs[1]
     assert_equal ["Users", "http://test.host/admin/users", {}], @breadcrumbs[2]
     assert_equal ["Sam", "http://test.host/admin/users/123", {}], @breadcrumbs[3]
+    assert_equal ["Base", "http://test.host/images", {}], @breadcrumbs[4]
   end
 
   private

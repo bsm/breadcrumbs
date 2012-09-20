@@ -18,6 +18,9 @@ end
 class UsersController < ActionController::Base
 end
 
+class ImagesController < ActionController::Base
+end
+
 module Admin
   class UsersController < ActionController::Base
   end
@@ -27,6 +30,7 @@ routes = ActionDispatch::Routing::RouteSet.new
 routes.draw do
   resources :tests
   resources :users
+  resources :images
   namespace :admin do
     resources :users
   end
@@ -40,4 +44,10 @@ class User
   def to_param; "123" end
   def name_was; "Sam" end
   def name; "" end
+end
+
+module Image
+  class Base
+    extend ActiveModel::Naming
+  end
 end

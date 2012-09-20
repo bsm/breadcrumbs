@@ -104,7 +104,9 @@ class Breadcrumbs < Array
   private
 
     def infer_model_name_from_symbol(symbol)
-      symbol.to_s.classify.constantize.model_name
+      klass = symbol.to_s.classify.constantize
+      klass = klass.const_get(:Base) if klass.instance_of?(Module)
+      klass.model_name
     end
 
     def infer_title_from_record(record)
